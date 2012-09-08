@@ -1,23 +1,72 @@
 
-int batMonPin = 0;         // input pin for the divider
-int val = 0;               // variable for the A/D value
-float pinVoltage = 0;      // variable to hold the calculated voltage
-float batteryVoltage = 0;
-float ratio = 2.316;       // Change this to match the MEASURED ratio of the circuit
+//Voltage divider values
+double RVDA = 99000;
+double RVDB = 14700;
+double VDscale = RVDB / ( RVDA + RVDB );
 
-void setup() {
-  
-  Serial.begin(19200);      // open the serial port at 9600 baud
+//Current sensing circuit values
+//double Rsense = 0.0005;
+//double RA = 1000;
+//double RB = 470K;
+//Calculate current scale value
+//double Iscale = RB / RA;
+
+//Calculates volts per div of Arduino
+float adc = 5/1024.0;
+
+//Raw input
+float val;
+//Output variables
+float Currentin,Currentout,Voltage,Power;
+
+void setup()
+{
+
+    Serial.begin(19600);
+
 }
 
-void loop() {  
-  val = analogRead(batMonPin);            //  read the voltage on the divider  
-  pinVoltage = val/(1023*5);              //  There are 1023 possible values between 0 and 5                                 
-  batteryVoltage = pinVoltage * ratio;     
+void loop()
+{
+    double valSum = 0;
+    for (int x=0; x<100; x++){
+      valSum = valSum + analogRead(1);
+    }
+    
+    val = valSum/100;
   
-  Serial.print("Voltage: ");
-  Serial.println(batteryVoltage);
-  
-  
-  delay(1000);                  //  Slow it down
-}
+    //Voltage calculation
+//    val = analogRead(0);
+    Voltage = (val * adc);
+    
+    
+    //Send down USB
+    Serial.print(Voltage);
+    Serial.println('V at pin');
+    Voltage = (val * adc)/VDscale;
+    Serial.print(Voltage);
+    Serial.println('V');
+
+    //Current calculation
+//    val = analogRead(1);
+//    Currentin = (val * adc)/(Iscale*Rsense);
+    //Send down USB
+//    Serial.print(Currentin);
+//    Serial.print('B');
+
+        //Current calculation
+
+//    val = analogRead(2);
+//    Currentout = (val * adc)/(Iscale*Rsense);
+    //Send down USB
+//    Serial.print(Currentout);
+//    Serial.print('C');
+
+    //Power calculation
+//    Power = Voltage * Current;
+    //Send down USB
+//    Serial.print(Power);
+//    Serial.print('D');
+
+    delay(1000);
+} 
